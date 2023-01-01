@@ -100,8 +100,8 @@ def session_to_data(session, tf_data):
         result[f'ses_{column}'] = [session_averages[column]]
 
     # add the average mean and std from the skip 
-    result['skip_mean'] = [previous_session['skip_2'].apply(np.mean)]
-    result['skip_std'] = [previous_session['skip_2'].apply(np.std)]
+    result['skip_mean'] = [previous_session['skip_2'].agg(np.mean)]
+    result['skip_std'] = [previous_session['skip_2'].agg(np.std)]
 
     # get the context type and premium from the session
     result['premium'] = previous_session.iloc[0]['premium']
@@ -110,7 +110,7 @@ def session_to_data(session, tf_data):
     # get the day from the session
     result['day'] = [datestr_to_day(previous_session['date'].iloc[0])]
 
-    # print(result)
+    # print(resn n    ult)
     return result
 
 
