@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import scipy.io as sio
+from sklearn.preprocessing import LabelEncoder
 from datetime import datetime
 
 TF_PATH = './data/track_features/tf_mini.csv'
@@ -125,30 +126,36 @@ def load_track_features(path):
     return tf_data
 
 
-def main():
+def load_session_data(path):
+    """Loads the data containing all the user session tracks"""
+    session_data = pd.read_csv(path)
+    for column in ('premium', 'context_type'):
+        le = LabelEncoder()
+        session_data[column] = le.fit_transform(session_data[column])
+
+    return session_data
+
+
+def preprocess_data(tf_path, training_path, x_path, y_path):
     """ Main function """
-    tf_data = load_track_features(TF_PATH)
-    session_data = pd.read_csv(TRAINING_PATH)
+    tf_data = load_track_features(tf_path)
+    session_data = load_session_data(training_path)
 
     # group the data by session
     groups = session_data.groupby(['session_id'], group_keys=False)
 
     # write the data of the session to the x file
-    print(f'writing data to {X_PATH}')
-    X_data = groups.apply(lambda s: session_to_data(s, tf_data))
-    print(X_data.head(10))
-    X_data.to_csv(X_PATH)
+    print(f'writing data to {x_path}')
+    x_data = groups.apply(lambda s: session_to_data(s, tf_data))
+    print(x_data.head(10))
+    x_data.to_csv(x_path)
 
     # write the result of the session to the y file
-    print(f'writing results to {Y_PATH}')
-    groups.apply(session_to_result).to_csv(Y_PATH)
-
-    
+    print(f'writing results to {y_path}')
+    groups.apply(session_to_result).to_csv(y_path)
 
     print('succesfully preprocessed data')
 
 
 if __name__=="__main__":
-    main()
-
-
+    preprocess_data(TF_PATH, TRAINING_PATH, X_PATH, Y_PATH)
