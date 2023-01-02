@@ -31,6 +31,13 @@ CURRENT_TRACK_COLUMNS = [ \
     'tempo', \
     'time_signature', \
     'valence' \
+    'acoustic_vector_1', \
+    'acoustic_vector_2', \
+    'acoustic_vector_3', \
+    'acoustic_vector_4', \
+    'acoustic_vector_5', \
+    'acoustic_vector_6', \
+    'acoustic_vector_7' \
 ]
 
 SESSION_AVERAGE_COLUMNS = [ \
@@ -55,6 +62,13 @@ SESSION_AVERAGE_COLUMNS = [ \
     'tempo', \
     'time_signature', \
     'valence' \
+    'acoustic_vector_1', \
+    'acoustic_vector_2', \
+    'acoustic_vector_3', \
+    'acoustic_vector_4', \
+    'acoustic_vector_5', \
+    'acoustic_vector_6', \
+    'acoustic_vector_7' \
 ]
 
 def datestr_to_day(date_string):
