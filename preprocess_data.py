@@ -30,7 +30,7 @@ CURRENT_TRACK_COLUMNS = [ \
     'speechiness', \
     'tempo', \
     'time_signature', \
-    'valence' \
+    'valence', \
     'acoustic_vector_1', \
     'acoustic_vector_2', \
     'acoustic_vector_3', \
@@ -61,7 +61,7 @@ SESSION_AVERAGE_COLUMNS = [ \
     'speechiness', \
     'tempo', \
     'time_signature', \
-    'valence' \
+    'valence', \
     'acoustic_vector_1', \
     'acoustic_vector_2', \
     'acoustic_vector_3', \
