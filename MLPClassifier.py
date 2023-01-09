@@ -12,8 +12,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from constants import X_PATH, Y_PATH, RESULTS_MLP
-from test_performance import calc_accuracy
-
 
 
 def preprocess_data(X, y):
