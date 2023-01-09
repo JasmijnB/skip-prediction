@@ -1,13 +1,10 @@
 import pandas as pd
 import numpy as np
-import scipy.io as sio
+from scipy import stats
 from sklearn.preprocessing import LabelEncoder
 from datetime import datetime
 
-TF_PATH = './data/track_features/tf_mini.csv'
-TRAINING_PATH = './data/training_set/log_mini.csv'
-Y_PATH = 'data/preprocessed_data/y.csv'
-X_PATH = 'data/preprocessed_data/X.csv'
+from constants import TF_PATH, TRAINING_PATH, Y_PATH, X_PATH
 
 CURRENT_TRACK_COLUMNS = [ \
     'duration', \
@@ -80,7 +77,7 @@ def datestr_to_day(date_string):
 def session_to_result(session):
     """ Returns the ground-truth for a session: The skip_2 value of the last track """
 
-    return session['skip_2'].iloc[-1]
+    return int(session['skip_2'].iloc[-1])
 
 
 def entry_to_track(session_entry, tf_data):
@@ -106,11 +103,11 @@ def session_to_data(session, tf_data):
 
     previous_session = session.iloc[:-1]
 
-    # find the corresponding tracks from the previous session and find the averages
+    # # find the corresponding tracks from the previous session and find the averages
     previous_tracks = previous_session.apply(lambda s: entry_to_track(s, tf_data), axis=1)
     session_averages = previous_tracks[SESSION_AVERAGE_COLUMNS].apply(np.mean, axis=0)
 
-    # put these averages into the resulting dataframe
+    # # put these averages into the resulting dataframe
     for column in SESSION_AVERAGE_COLUMNS:
         result[f'ses_{column}'] = [session_averages[column]]
 
@@ -118,16 +115,15 @@ def session_to_data(session, tf_data):
     result['skip_mean'] = [previous_session['skip_2'].agg(np.mean)]
     result['skip_std'] = [previous_session['skip_2'].agg(np.std)]
 
-    # get the context type and premium from the session
+    # # get the context type and premium from the session
     result['premium'] = previous_session.iloc[0]['premium']
     result['context_type'] = previous_session.iloc[0]['context_type']
 
-    # get the day from the session
+    # # get the day from the session
     result['day'] = [datestr_to_day(previous_session['date'].iloc[0])]
 
     # print(resn n    ult)
     return result
-
 
 def load_track_features(path):
     """ loads the track features and preprocesses them """
@@ -143,10 +139,13 @@ def load_track_features(path):
 def load_session_data(path):
     """Loads the data containing all the user session tracks"""
     session_data = pd.read_csv(path)
+    session_data = session_data[session_data['session_position'] <= 10]
     for column in ('premium', 'context_type'):
         le = LabelEncoder()
         session_data[column] = le.fit_transform(session_data[column])
 
+    # have only 10 sessions:
+    # session_data = session_data.iloc[:100]
     return session_data
 
 
@@ -158,15 +157,15 @@ def preprocess_data(tf_path, training_path, x_path, y_path):
     # group the data by session
     groups = session_data.groupby(['session_id'], group_keys=False)
 
-    # write the data of the session to the x file
+    # write the data of the sessiotf_data to the x file
     print(f'writing data to {x_path}')
     x_data = groups.apply(lambda s: session_to_data(s, tf_data))
-    print(x_data.head(10))
     x_data.to_csv(x_path)
 
     # write the result of the session to the y file
     print(f'writing results to {y_path}')
-    groups.apply(session_to_result).to_csv(y_path)
+    y_data = groups.apply(session_to_result)
+    y_data.to_csv(y_path)
 
     print('succesfully preprocessed data')
 
